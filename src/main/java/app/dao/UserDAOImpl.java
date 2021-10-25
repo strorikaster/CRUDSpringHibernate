@@ -2,47 +2,42 @@ package app.dao;
 
 import app.model.User;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Component
 public class UserDAOImpl implements UserDAO {
-    private static int USER_COUNT;
-    private List<User> users;
 
-    {
-        users = new ArrayList<>();
-
-        users.add(new User(++USER_COUNT, "Tom", "White", "tomwhite@gmail.com", 37));
-        users.add(new User(++USER_COUNT, "Bob", "Black", "babblack@gmail.com",25));
-        users.add(new User(++USER_COUNT, "Nick", "Green", "nickgreen@gmail.com", 14));
-        users.add(new User(++USER_COUNT, "Mike", "Macferson", "mikemacferson@gmail.com",10));
-    }
+    @PersistenceContext
+    EntityManager entityManager;
 
     public List<User> index() {
-        return users;
+        return entityManager.createQuery("from User", User.class).getResultList();
     }
 
     public User show(int id) {
-        return users.stream().filter(users -> users.getId() == id).findAny().orElse(null);
+        return entityManager.find(User.class, id);
     }
 
+    @Transactional
     public void save(User user) {
-        user.setId(++USER_COUNT);
-        users.add(user);
+        entityManager.persist(user);
+        entityManager.flush();
     }
 
-    public void update(int id, User updatedUser) {
-        User userToBeUpdated = show(id);
-
-        userToBeUpdated.setName(updatedUser.getName());
-        userToBeUpdated.setSurName(updatedUser.getSurName());
-        userToBeUpdated.setEmail(updatedUser.getEmail());
-        userToBeUpdated.setAge(updatedUser.getAge());
+    @Transactional
+    public void update(User updatedUser) {
+          entityManager.merge(updatedUser);
+          entityManager.flush();
     }
 
+    @Transactional
     public void delete(int id) {
-        users.removeIf(u -> u.getId() == id);
+        User user = show(id);
+        entityManager.remove(user);
+        entityManager.flush();
     }
 }

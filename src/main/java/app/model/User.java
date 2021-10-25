@@ -1,21 +1,31 @@
 package app.model;
 
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class User {
+@Entity
+@Table(name = "users")
+    public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column
     @NotEmpty(message = "Empty values not allowed")
     @Size(min = 2, max = 30, message = "Name should be between 2 and 30 character")
     private String name;
+
+    @Column
     @NotEmpty(message = "Empty values not allowed")
     private String surName;
+    @Column
     @NotEmpty(message = "Empty values not allowed")
     @Email(message = "Not correct email entered")
     private String email;
+    @Column
     @Min(value = 0, message = "Age must be greater than 0")
     private int age;
 

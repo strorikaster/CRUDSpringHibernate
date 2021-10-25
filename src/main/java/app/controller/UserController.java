@@ -1,6 +1,5 @@
 package app.controller;
 
-
 import app.dao.UserDAO;
 import app.model.User;
 import org.springframework.stereotype.Controller;
@@ -40,7 +39,7 @@ public class UserController {
 //        model.addAttribute("user", new User());
         return "users/new";
     }
-
+//
     @PostMapping()
     public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
@@ -61,7 +60,7 @@ public class UserController {
         if(bindingResult.hasErrors()) {
             return "users/edit";
         }
-        userDAO.update(id, user);
+        userDAO.update(user);
         return "redirect:/users";
     }
 
