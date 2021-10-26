@@ -1,7 +1,9 @@
 package app.controller;
 
-import app.dao.UserDAO;
+import app.repository.UserRepository;
 import app.model.User;
+import app.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,45 +15,43 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 public class UserController {
 
-    private UserDAO userDAO;
+    @Autowired
+    private UserService userService;
 
-    public UserController(UserDAO userDAO) {
-        this.userDAO = userDAO;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping()
-    public String index(Model model) {
+    public String getAllUsers(Model model) {
     //Получим всех людей из Dao и передадим на отображение в представление
-        model.addAttribute("users", userDAO.index());
+        model.addAttribute("users", userService.getAllUsers());
         return "users/index";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
-    //Получим одного человека из Dao и передадим на отображение в представление
-        model.addAttribute("user", userDAO.show(id));
+        model.addAttribute("user", userService.show(id));
         return "users/show";
     }
 
     @GetMapping("/new")
     public String newUser(@ModelAttribute("user") User user) {
-//    public String newUser(Model model) {
-//        model.addAttribute("user", new User());
         return "users/new";
     }
-//
+
     @PostMapping()
     public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "users/new";
         }
-        userDAO.save(user);
+        userService.save(user);
         return "redirect:/users";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", userDAO.show(id));
+        model.addAttribute("user", userService.show(id));
         return "users/edit";
     }
 
@@ -60,13 +60,13 @@ public class UserController {
         if(bindingResult.hasErrors()) {
             return "users/edit";
         }
-        userDAO.update(user);
+        userService.update(user);
         return "redirect:/users";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        userDAO.delete(id);
+        userService.delete(id);
         return "redirect:/users";
     }
 }
